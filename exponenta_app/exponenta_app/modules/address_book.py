@@ -40,16 +40,13 @@ Type command or 'help' for more information."""
 
 
 class CommonInterface(ABC):
-    # def __init__(self, output):
-    #     self.output = output
-
     @abstractmethod
-    def show_data(self, data: str):
-        return NotImplementedError
+    def show_data(self, data: str) -> None:
+        pass
 
 
 class UserInterface(CommonInterface):
-    def show_data(self, output: str = None):
+    def show_data(self, output: str = None) -> None:
         print(output)
 
 
