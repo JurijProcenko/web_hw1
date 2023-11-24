@@ -38,14 +38,19 @@ help_message = """Use next commands:
 greeting_message = """Welcome to Address Book.
 Type command or 'help' for more information."""
 
-class CommonInterface(ABC):
-    @abstractmethod
-    def show_date(self, data: str):
-        pass
 
-class UserInterface:
-    def show_data(self, data):
-        print(data)
+class CommonInterface(ABC):
+    # def __init__(self, output):
+    #     self.output = output
+
+    @abstractmethod
+    def show_data(self, data: str):
+        return NotImplementedError
+
+
+class UserInterface(CommonInterface):
+    def show_data(self, output: str = None):
+        print(output)
 
 
 class DateError(Exception):
@@ -91,7 +96,7 @@ class Email(Field):
         return self.__email
 
     @email.setter
-    def email(self, email:str):
+    def email(self, email: str):
         if re.match(r"[A-z.]+\w+@[A-z]+\.[A-Za-z]{2,}", email):
             self.__email = email
         else:
@@ -394,7 +399,7 @@ def change_record(name: str, phone: str, new_phone: str) -> str:
 
 @input_error
 def delete_record(*args):
-    name, _ = find_name(' '.join(args))
+    name, _ = find_name(" ".join(args))
     if phone_book.get(name):
         phone_book.delete(name)
         return f"Record with name {name} deleted."
@@ -461,11 +466,11 @@ def show_all(*args):
     try:
         if args[0]:
             for rec in phone_book.iterator(int(args[0])):
-                print("\n".join([str(r) for r in rec]))
+                UserInterface().show_data("\n".join([str(r) for r in rec]))
                 input("Press Enter for next records")
     except:
         for rec in phone_book.iterator():
-            print("\n".join([str(r) for r in rec]))
+            UserInterface().show_data("\n".join([str(r) for r in rec]))
 
 
 def save_book() -> str:
@@ -555,39 +560,40 @@ def addressbook_main():
             print(phone_book.load_book())
     except:
         ...
+
     greeting()
+    menu_completer = NestedCompleter.from_nested_dict(
+        {
+            "add": {"name phone": None},
+            "add_phone": {"name phone(10 digits)": None},
+            "add_birthday": {"name dd/mm/YYYY"},
+            "birthday": {"num_days": None},
+            "add_adress": {"name adress"},
+            "adress": {"name": None},
+            "change": {"name phone new_phone": None},
+            "days_to_birthday": {"name": None},
+            "delete_adr": {"name": None},
+            "delete_phone": {"name phone"},
+            "delete_record": {"name": None},
+            "email": {"name email@": None},
+            "find": {"anything": None},
+            "hello": None,
+            "help": None,
+            "show_all": {"20"},
+            "exit": None,
+            "close": None,
+            "good_buy": None,
+        }
+    )
     while True:
-        menu_completer = NestedCompleter.from_nested_dict(
-            {
-                "add": {"name phone": None},
-                "add_phone": {"name phone(10 digits)": None},
-                "add_birthday": {"name dd/mm/YYYY"},
-                "birthday": {"num_days": None},
-                "add_adress": {"name adress"},
-                "adress": {"name": None},
-                "change": {"name phone new_phone": None},
-                "days_to_birthday": {"name": None},
-                "delete_adr": {"name": None},
-                "delete_phone": {"name phone"},
-                "delete_record": {"name": None},
-                "email": {"name email@": None},
-                "find": {"anything": None},
-                "hello": None,
-                "help": None,
-                "show_all": {"20"},
-                "exit": None,
-                "close": None,
-                "good_buy": None,
-            }
+        user_input = prompt(
+            "\nEnter command or 'help' for help: ", completer=menu_completer
         )
 
-        user_input = prompt(
-            "Enter command or 'help' for help: ", completer=menu_completer
-        )
-        cli = UserInterface()
         func, data = parcer(user_input)
         result = func(*data)
-        cli.show_data(result)
+        user_interface = UserInterface()
+        user_interface.show_data(result)
         # print(result)
         if result == "Phonebook saved. Good bye!":
             break
