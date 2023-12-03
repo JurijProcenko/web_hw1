@@ -1,7 +1,7 @@
 from prompt_toolkit.shortcuts import radiolist_dialog
 from prompt_toolkit.styles import Style
 
-from .modules import addressbook_main, note_main, sort_main
+from modules import addressbook_main, note_main, sort_main
 
 
 def main():
@@ -9,25 +9,27 @@ def main():
     while result is not None:
         result = radiolist_dialog(
             title="Welcome to Exponenta app.",
-            text='''Here you can:
+            text="""Here you can:
         1. make your own address book,
         2. write some notes,
         3. sort your folder with random files
-What would you like to do ? ''',
+What would you like to do ? """,
             values=[
                 ("addressbook", "Address book"),
                 ("notebook", "Notebook"),
                 ("sort", "Sort directory"),
             ],
-            style=Style.from_dict({
-                'dialog': 'bg:#539ce6',
-                # 'button': 'bg:#bf99a4',
-                'checkbox': '#e8612c',
-                'dialog.body': 'bg:#a9cfd0',
-                # 'dialog shadow': 'bg:#3540bd',
-                'frame.label': '#280e6e',
-                'dialog.body label': '#613ccf',
-            })
+            style=Style.from_dict(
+                {
+                    "dialog": "bg:#539ce6",
+                    # 'button': 'bg:#bf99a4',
+                    "checkbox": "#e8612c",
+                    "dialog.body": "bg:#a9cfd0",
+                    # 'dialog shadow': 'bg:#3540bd',
+                    "frame.label": "#280e6e",
+                    "dialog.body label": "#613ccf",
+                }
+            ),
         ).run()
         print(result)
         if result == "addressbook":

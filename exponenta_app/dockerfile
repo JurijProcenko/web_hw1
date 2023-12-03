@@ -1,0 +1,11 @@
+FROM python:3.12
+
+ENV APP_HOME /
+
+WORKDIR $APP_HOME
+
+COPY . .
+
+RUN pip install -r requirements.txt
+
+ENTRYPOINT ["python", "/exponenta_app/exponenta_main.py"]
