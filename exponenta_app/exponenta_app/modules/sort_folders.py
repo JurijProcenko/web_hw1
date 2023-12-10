@@ -1,35 +1,76 @@
 # import sys
+from threading import Thread
 import os
 from pathlib import Path
 import re
 import shutil
 from zipfile import ZipFile
 
-CATEGORIES = {"audio": [".mp3", ".wav", ".flac", ".wma"],
-              "video": [".mkv", ".avi", ".mov", ".mp4"],
-              "images": [".jpeg", ".png", ".jpg", ".svg"],
-              "archives": [".zip", ".gz", ".tar"],
-              "docs": [".doc", ".docx", ".txt", ".pdf", ".xlsx", ".pptx"]
-              }
+CATEGORIES = {
+    "audio": [".mp3", ".wav", ".flac", ".wma"],
+    "video": [".mkv", ".avi", ".mov", ".mp4"],
+    "images": [".jpeg", ".png", ".jpg", ".svg"],
+    "archives": [".zip", ".gz", ".tar"],
+    "docs": [".doc", ".docx", ".txt", ".pdf", ".xlsx", ".pptx"],
+}
 
-file_list = {"audio": [],
-             "video": [],
-             "images": [],
-             "archives": [],
-             "docs": [],
-             "other": []
-             }
-ext_list = {"audio": [],
-            "video": [],
-            "images": [],
-            "archives": [],
-            "docs": [],
-            "other": []
-            }
+file_list = {
+    "audio": [],
+    "video": [],
+    "images": [],
+    "archives": [],
+    "docs": [],
+    "other": [],
+}
+ext_list = {
+    "audio": [],
+    "video": [],
+    "images": [],
+    "archives": [],
+    "docs": [],
+    "other": [],
+}
 
 CYRILLIC_SYMBOLS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяєіїґ"
-TRANSLATION = ("a", "b", "v", "g", "d", "e", "e", "j", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
-               "f", "h", "ts", "ch", "sh", "sch", "", "y", "", "e", "yu", "ya", "je", "i", "ji", "g")
+TRANSLATION = (
+    "a",
+    "b",
+    "v",
+    "g",
+    "d",
+    "e",
+    "e",
+    "j",
+    "z",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "r",
+    "s",
+    "t",
+    "u",
+    "f",
+    "h",
+    "ts",
+    "ch",
+    "sh",
+    "sch",
+    "",
+    "y",
+    "",
+    "e",
+    "yu",
+    "ya",
+    "je",
+    "i",
+    "ji",
+    "g",
+)
 TRANS = {}
 for c, l in zip(CYRILLIC_SYMBOLS, TRANSLATION):
     TRANS[ord(c)] = l
@@ -91,7 +132,8 @@ def sort_folder(path: Path) -> None:
     for i in path.glob("**/*"):
         if i.is_file():
             category = get_category(i)
-            move_file(i, category, path)
+            thread = Thread(target=move_file, args=(i, category, path))
+            thread.start()
 
 
 def delete_empty_folders(path: Path) -> None:
@@ -102,7 +144,10 @@ def delete_empty_folders(path: Path) -> None:
 
 def sort_main() -> str:
     while True:
-        folder = input("Enter the full folder path you want to sort or 'exit' to finish: \n>>>")
+        folder = input(
+            "Enter the full folder path you want to sort or 'exit' to finish: \n>>>"
+        )
+        # folder = "W:\\1\\"
         if folder == "exit":
             return "Good bye"
         elif folder:
